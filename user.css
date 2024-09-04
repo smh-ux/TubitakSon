@@ -1,0 +1,121 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  background-color: #FFFFFF;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  width: 100%;
+  height: 100%;
+}
+
+.exit {
+  font-size: 2.5em;
+  float: right;
+  color: #FF5800;
+  margin-top: 2%;
+  margin-right: 5%;
+  transition: 0.3s;
+}
+
+.exit:hover {
+  color: #7A7D81;
+  transition: 0.3s;
+}
+
+.weather {
+  width: 100%;
+  height: 84%;
+  background-color: #aaa;
+}
+
+.parameters {
+  width: 100%;
+  height: 100%;
+  background-color: #aaa;
+}
+
+.empty{
+  width: 100%;
+  height: 5%;
+}
+
+.title-container {
+  background-color: #aaa;
+}
+
+.title {
+  color: #444;
+  font-size: 50px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.full-container {
+  width: 20%;
+  height: 50%;
+  margin-top: 5%;
+  margin-left: 8%;
+  background-color: #666;
+  border-radius: 50px;
+  display: inline-block;
+  transition: 0.5s;
+  box-shadow: 0px 0px 40px rgba(102, 102, 102, 1), inset 0px 0px 40px rgba(80, 80, 80, 1);
+}
+
+.full-container:hover {
+  box-shadow: 0px 0px 40px rgba(255, 88, 1, 1);
+  transition: 0.5s;
+}
+
+.subtitle {
+  font-weight: bold;
+  font-size: 35px;
+  text-align: center;
+  margin-top: 10%;
+  color: rgba(255, 88, 1, 1);
+}
+
+.value {
+  font-size: 30px;
+  font-weight: bold; 
+  text-align: center;
+  margin-top : 10%;
+  margin-bottom: 10%;
+  color: rgba(255, 88, 1, 1);
+}
+
+.image-title {
+  width: 100%;
+  height: 16%;
+  background-color: #666;
+}
+
+.img-text {
+  text-align: center;
+  padding-top: 4%;
+  color: rgba(255, 88, 1, 1);
+}
+
+.top {
+  margin-top: 0%;
+  width: 100%;
+  height: 100%;
+}
+
+img {
+  width: 100%;
+  height: 100%;
+}
+
+.graph {
+  background-color: rgba(0, 0, 0, 0.9);
+  margin-left: 0%;
+  border-top: 1px solid #E3E9EF;
+}
