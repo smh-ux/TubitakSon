@@ -1,5 +1,9 @@
 <?php
 
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
+// error_reporting(E_ALL);
+
 if(!isset($_SESSION['loggedinMember'])) {
     header("Location: index.php?page=login");
 }
@@ -13,49 +17,69 @@ if(isset($_GET['userid']) && isset($_GET['coopid']) && isset($_GET['nestingid'])
     $stmt->execute([$nestingid]);
     $datas = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // // Kahverengi
+    // Renklerine göre yumurta sayısını almak için veritabanı sorgusu
+    $stmt5 = $pdo->prepare("SELECT MONTH(veriler.Zaman) AS ay, yumurtalar.Renk AS renk, COUNT(*) AS total FROM veriler JOIN yumurtalar ON veriler.YumurtaID = yumurtalar.YumurtaID WHERE veriler.FollukID = ? GROUP BY ay, renk ORDER BY ay");
+    $stmt5->execute([$nestingid]);
+    $lastdata = $stmt5->fetchAll(PDO::FETCH_ASSOC);
+
+    $colorData = [];
+    foreach ($lastdata as $row) {
+        $month = $row['ay'] - 1; // 0 tabanlı diziler için ayı bir azaltıyoruz
+        $color = $row['renk'];
+        $count = $row['total'];
+        
+        if (!isset($colorData[$color])) {
+            $colorData[$color] = array_fill(0, 12, 0);
+        }
+        $colorData[$color][$month] = $count;
+    }
+
+    // JavaScript'e aktarılacak dizi
+    $dataFromPHP = json_encode($colorData);
+
+    // // Brown
     // $stmt2 = $pdo->prepare("SELECT COUNT(*) AS total FROM yumurtalar JOIN veriler ON yumurtalar.YumurtaID = veriler.YumurtaID WHERE veriler.FollukID = ? AND Renk = 'Kahverengi'");
     // $stmt2->execute([$nestingid]);
     // $brown = $stmt2->fetch(PDO::FETCH_ASSOC);
     // $totalBrown = $brown['total'];
-    //
-    // // Beyaz
+
+    // // White
     // $stmt3 = $pdo->prepare("SELECT COUNT(*) AS total FROM yumurtalar JOIN veriler ON yumurtalar.YumurtaID = veriler.YumurtaID WHERE veriler.FollukID = ? AND Renk = 'Beyaz'");
     // $stmt3->execute([$nestingid]);
-    // $white = $stm3->fetchAll(PDO::FETCH_ASSOC);
+    // $white = $stmt3->fetch(PDO::FETCH_ASSOC);
     // $totalWhite = $white['total'];
-    //
-    // // Mavi
+
+    // // Blue
     // $stmt4 = $pdo->prepare("SELECT COUNT(*) AS total FROM yumurtalar JOIN veriler ON yumurtalar.YumurtaID = veriler.YumurtaID WHERE veriler.FollukID = ? AND Renk = 'Mavi'");
     // $stmt4->execute([$nestingid]);
-    // $blue = $stmt4->fetchAll(PDO::FETCH_ASSOC);
+    // $blue = $stmt4->fetch(PDO::FETCH_ASSOC);
     // $totalBlue = $blue['total'];
 
     // $stmt5 = $pdo->prepare("SELECT MONTH(veriler.Zaman) AS ay, yumurtalar.Renk AS renk, COUNT(*) AS total FROM veriler JOIN yumurtalar ON veriler.YumurtaID = yumurtalar.YumurtaID WHERE veriler.FollukID = ? GROUP BY ay, renk ORDER BY ay");
     // $stmt5->execute([$nestingid]);
     // $lastdata = $stmt5->fetchAll(PDO::FETCH_ASSOC);
-    //
+    
     // $months = [];
     // $colors = [];
     // $colorData = [];
-    //
+    
     // foreach ($lastdata as $row) {
     //     $month = $row['ay'];
     //     $color = $row['renk'];
     //     $count = $row['total'];
-    //
+    
     //     // Ayları ve renkleri gruplama
     //     if (!in_array($month, $months)) {
     //         $months[] = $month;
     //     }
-    //
+    
     //     if (!isset($colors[$color])) {
     //         $colors[$color] = array_fill(0, 12, 0);
     //     }
-    //
+    
     //     $colors[$color][$month - 1] = $count;
     // }
-    //
+    
     // $monthNames = [
     //     1 => 'Ocak',
     //     2 => 'Şubat',
@@ -70,11 +94,11 @@ if(isset($_GET['userid']) && isset($_GET['coopid']) && isset($_GET['nestingid'])
     //     11 => 'Kasım',
     //     12 => 'Aralık'
     // ];
-    //
+    
     // $months = array_map(function($m) use ($monthNames) {
     //     return $monthNames[$m];
     // }, $months);
-    //
+    
     // $dataFromPHP = [
     //     'months' => $months,
     //     'colors' => $colors
@@ -183,38 +207,29 @@ if(isset($_GET['userid']) && isset($_GET['coopid']) && isset($_GET['nestingid'])
 
         <script>
 
-            var canvas = document.getElementById("myCanvas");
-            var ctx = canvas.getContext("2d");
-            var data = [12, 19, 3, 17, 6, 3, 7, 12, 19, 3, 17, 6];
-            var labels = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            var colorData = <?php echo $dataFromPHP; ?>;
 
+            var months = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+
+            var datasets = [];
+
+            // Her bir renk için veri kümesi oluştur
+            for (var color in colorData) {
+                datasets.push({
+                    label: color.charAt(0).toUpperCase() + color.slice(1), // Renk ismini büyük harfle başlat
+                    data: colorData[color],
+                    backgroundColor: color === 'mavi' ? 'rgba(0, 0, 255, 1)' : (color === 'beyaz' ? 'rgba(255, 255, 255, 1)' : 'rgba(97, 49, 4, 1)'),
+                    borderColor: color === 'mavi' ? 'rgba(0, 0, 255, 1)' : (color === 'beyaz' ? 'rgba(255, 255, 255, 1)' : 'rgba(97, 49, 4, 1)'),
+                    borderWidth: 1
+                });
+            }
+
+            var ctx = document.getElementById("myCanvas").getContext("2d");
             var myChart = new Chart(ctx, {
-                type: 'bar',
+                type: 'line',
                 data: {
-                    labels: ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'],
-                    datasets: [
-                        {
-                            label: 'Mavi',
-                            data: [12, 19, 3, 5, 2, 3, 12, 19, 3, 5, 2, 3],
-                            backgroundColor: 'rgba(0, 0, 255, 1)',
-                            borderColor: 'rgba(0, 0, 255, 1)',
-                            borderWidth: 1
-                        },
-                        {
-                            label: 'Beyaz',
-                            data: [20, 30, 40, 50, 20, 30, 40, 50, 20, 30, 40, 50],
-                            backgroundColor: 'rgba(255, 255, 255, 1)',
-                            borderColor: 'rgba(255, 255, 255, 1)',
-                            borderWidth: 1
-                        },
-                        {
-                            label: 'Kahverengi',
-                            data: [10, 20, 30, 40, 10, 20, 30, 40, 10, 20, 30, 40],
-                            backgroundColor: 'rgba(97, 49, 4, 1)',
-                            borderColor: 'rgba(97, 49, 4, 1)',
-                            borderWidth: 1
-                        },
-                    ]
+                    labels: months,
+                    datasets: datasets
                 },
                 options: {
                     plugins: {
@@ -245,9 +260,71 @@ if(isset($_GET['userid']) && isset($_GET['coopid']) && isset($_GET['nestingid'])
                 }
             });
 
+            // var canvas = document.getElementById("myCanvas");
+            // var ctx = canvas.getContext("2d");
+            // var data = [12, 19, 3, 17, 6, 3, 7, 12, 19, 3, 17, 6];
+            // var labels = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+            // var myChart = new Chart(ctx, {
+            //     type: 'line',
+            //     data: {
+            //         labels: ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'],
+            //         datasets: [
+            //             {
+            //                 label: 'Mavi',
+            //                 data: [12, 19, 3, 5, 2, 3, 12, 19, 3, 5, 2, 3],
+            //                 backgroundColor: 'rgba(0, 0, 255, 1)',
+            //                 borderColor: 'rgba(0, 0, 255, 1)',
+            //                 borderWidth: 1
+            //             },
+            //             {
+            //                 label: 'Beyaz',
+            //                 data: [20, 30, 40, 50, 20, 30, 40, 50, 20, 30, 40, 50],
+            //                 backgroundColor: 'rgba(255, 255, 255, 1)',
+            //                 borderColor: 'rgba(255, 255, 255, 1)',
+            //                 borderWidth: 1
+            //             },
+            //             {
+            //                 label: 'Kahverengi',
+            //                 data: [10, 20, 30, 40, 10, 20, 30, 40, 10, 20, 30, 40],
+            //                 backgroundColor: 'rgba(97, 49, 4, 1)',
+            //                 borderColor: 'rgba(97, 49, 4, 1)',
+            //                 borderWidth: 1
+            //             },
+            //         ]
+            //     },
+            //     options: {
+            //         plugins: {
+            //             title: {
+            //                 display: true,
+            //                 text: 'Renklerine Göre Yumurta Sayısı',
+            //                 font: {
+            //                     size: 24
+            //                 }
+            //             }
+            //         },
+            //         scales: {
+            //             x: {
+            //                 beginAtZero: true,
+            //                 title: {
+            //                     display: true,
+            //                     text: 'Aylar'
+            //                 }
+            //             },
+            //             y: {
+            //                 beginAtZero: true,
+            //                 title: {
+            //                     display: true,
+            //                     text: 'Yumurta Sayısı'
+            //                 }
+            //             }
+            //         }
+            //     }
+            // });
+
             // var ctx = document.getElementById('myCanvas').getContext('2d');
             // var dataFromPHP = <?= json_encode($dataFromPHP) ?>;
-            //
+            
             // var myChart = new Chart(ctx, {
             //     type: 'bar',
             //     data: {
@@ -290,7 +367,7 @@ if(isset($_GET['userid']) && isset($_GET['coopid']) && isset($_GET['nestingid'])
             //         }
             //     }
             // });
-            //
+            
             // function getColor(color) {
             //     switch(color) {
             //         case 'Kahverengi': return 'rgba(97, 49, 4, 1)';
@@ -299,90 +376,6 @@ if(isset($_GET['userid']) && isset($_GET['coopid']) && isset($_GET['nestingid'])
             //         default: return 'rgba(0, 0, 0, 1)';
             //     }
             // }
-
-
-            // let rangeMin = 100;
-            // const range = document.querySelector(".range-selected");
-            // const rangeInput = document.querySelectorAll(".range-input input");
-            // const rangePrice = document.querySelectorAll(".range-price input");
-
-            // rangeInput.forEach((input) => {
-            //     input.addEventListener("input", (e) => {
-            //         let minRange = parseInt(rangeInput[0].value);
-            //         let maxRange = parseInt(rangeInput[1].value);
-            //         if (maxRange - minRange < rangeMin) {
-            //             if (e.target.className === "min") {
-            //                 rangeInput[0].value = maxRange - rangeMin;
-            //             } else {
-            //                 rangeInput[1].value = minRange + rangeMin;
-            //             }
-            //         } else {
-            //             rangePrice[0].value = minRange;
-            //             rangePrice[1].value = maxRange;
-            //             range.style.left = (minRange / rangeInput[0].max) * 100 + "%";
-            //             range.style.right = 100 - (maxRange / rangeInput[1].max) * 100 + "%";
-            //         }
-            //     });
-            // });
-
-            // rangePrice.forEach((input) => {
-            //     input.addEventListener("input", (e) => {
-            //     let minPrice = rangePrice[0].value;
-            //     let maxPrice = rangePrice[1].value;
-            //     if (maxPrice - minPrice >= rangeMin && maxPrice <= rangeInput[1].max) {
-            //         if (e.target.className === "min") {
-            //             rangeInput[0].value = minPrice;
-            //             range.style.left = (minPrice / rangeInput[0].max) * 100 + "%";
-            //         } else {
-            //             rangeInput[1].value = maxPrice;
-            //             range.style.right = 100 - (maxPrice / rangeInput[1].max) * 100 + "%";
-            //         }
-            //     }
-            //     });
-            // });
-
-
-
-            // let rangeMin1 = 100;
-            // const range1 = document.querySelector(".range-selected1");
-            // const rangeInput1 = document.querySelectorAll(".range-input1 input");
-            // const rangePrice1 = document.querySelectorAll(".range-price1 input");
-
-            // rangeInput1.forEach((input) => {
-            //     input.addEventListener("input", (e) => {
-            //         let minRange = parseInt(rangeInput1[0].value);
-            //         let maxRange = parseInt(rangeInput1[1].value);
-            //         if (maxRange - minRange < rangeMin1) {
-            //             if (e.target.className === "min1") {
-            //                 rangeInput1[0].value = maxRange - rangeMin1;
-            //             } else {
-            //                 rangeInput1[1].value = minRange + rangeMin1;
-            //             }
-            //         } else {
-            //             rangePrice1[0].value = minRange;
-            //             rangePrice1[1].value = maxRange;
-            //             range1.style.left = (minRange / rangeInput1[0].max) * 100 + "%";
-            //             range1.style.right = 100 - (maxRange / rangeInput1[1].max) * 100 + "%";
-            //         }
-            //     });
-            // });
-
-            // rangePrice1.forEach((input) => {
-            //     input.addEventListener("input", (e) => {
-            //     let minPrice = rangePrice1[0].value;
-            //     let maxPrice = rangePrice1[1].value;
-            //     if (maxPrice - minPrice >= rangeMin1 && maxPrice <= rangeInput1[1].max) {
-            //         if (e.target.className === "min1") {
-            //             rangeInput1[0].value = minPrice;
-            //             range1.style.left = (minPrice / rangeInput1[0].max) * 100 + "%";
-            //         } else {
-            //             rangeInput1[1].value = maxPrice;
-            //             range1.style.right = 100 - (maxPrice / rangeInput1[1].max) * 100 + "%";
-            //         }
-            //     }
-            //     });
-            // });
-
         </script>
     </body>
 </html>
