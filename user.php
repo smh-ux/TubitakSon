@@ -1,381 +1,254 @@
 <?php
-
-// ini_set('display_errors', 1);
-// ini_set('display_startup_errors', 1);
-// error_reporting(E_ALL);
-
+// Kullanıcı giriş yapmış mı diye kontrol et.
 if(!isset($_SESSION['loggedinMember'])) {
     header("Location: index.php?page=login");
 }
 
 if(isset($_GET['userid']) && isset($_GET['coopid']) && isset($_GET['nestingid'])) {
+    // Önceki sayfalarda gelen kullanıcı, kümes, folluk id biligilerini alıyoruz.
     $userid    = $_GET['userid'];
     $coopid    = $_GET['coopid'];
     $nestingid = $_GET['nestingid'];
 
-    $stmt = $pdo->prepare("SELECT kumesler.Konum, veriler.Zaman, veriler.kumesID, veriler.YumurtaID, veriler.Sicaklik, veriler.Nem, veriler.Desibel, veriler.ReferansYumurta, veriler.Adet, veriler.FollukID FROM kumesler JOIN veriler ON kumesler.FollukID = veriler.FollukID WHERE kumesler.FollukID = ?");
-    $stmt->execute([$nestingid]);
-    $datas = $stmt->fetch(PDO::FETCH_ASSOC);
+    // Anlık sensör verilerini almak için.
+    $stmt = $pdo->prepare("SELECT * FROM sensors WHERE coop_id = ? ORDER BY id DESC LIMIT 1");
+    $stmt->execute([$coopid]);
+    $sensors = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Renklerine göre yumurta sayısını almak için veritabanı sorgusu
-    $stmt5 = $pdo->prepare("SELECT MONTH(veriler.Zaman) AS ay, yumurtalar.Renk AS renk, COUNT(*) AS total FROM veriler JOIN yumurtalar ON veriler.YumurtaID = yumurtalar.YumurtaID WHERE veriler.FollukID = ? GROUP BY ay, renk ORDER BY ay");
-    $stmt5->execute([$nestingid]);
-    $lastdata = $stmt5->fetchAll(PDO::FETCH_ASSOC);
+    // Anlık yumurta verilerini çekmek için.
+    $stmt1 = $pdo->prepare("SELECT * FROM eggs WHERE nest_id = ? ORDER BY id DESC LIMIT 1");
+    $stmt1->execute([$nestingid]);
+    $eggs = $stmt1->fetch(PDO::FETCH_ASSOC);
 
-    $colorData = [];
-    foreach ($lastdata as $row) {
-        $month = $row['ay'] - 1; // 0 tabanlı diziler için ayı bir azaltıyoruz
-        $color = $row['renk'];
-        $count = $row['total'];
-        
-        if (!isset($colorData[$color])) {
-            $colorData[$color] = array_fill(0, 12, 0);
-        }
-        $colorData[$color][$month] = $count;
+    // Anlık resim verisini almak için.
+    $stmt2 = $pdo->prepare("SELECT * FROM nests WHERE coop_id = ? ORDER BY id DESC LIMIT 1");
+    $stmt2->execute([$coopid]);
+    $images = $stmt2->fetch(PDO::FETCH_ASSOC);
+
+    // Toplam yumurta sayısını tutmak için.
+    $total = $eggs['white_eggs'] + $eggs['brown_eggs'] + $eggs['blue_eggs'];
+
+    // Tüm yumurta verilerini almak için.
+    $stmt12 = $pdo->prepare("SELECT * FROM eggs WHERE nest_id = ? ORDER BY created_at ASC");
+    $stmt12->execute([$nestingid]);
+    $eggsHistory = $stmt12->fetchAll(PDO::FETCH_ASSOC);
+
+    // 01.01.2001 gibi değerleri pazartesi gibi string değere çevirmek için.
+    $days = [];
+    foreach ($eggsHistory as $row) {
+        $date = new DateTime($row['created_at']);
+        $days[] = $date->format('l'); // Pazartesi, Salı gibi günler
     }
 
-    // JavaScript'e aktarılacak dizi
-    $dataFromPHP = json_encode($colorData);
-
-    // // Brown
-    // $stmt2 = $pdo->prepare("SELECT COUNT(*) AS total FROM yumurtalar JOIN veriler ON yumurtalar.YumurtaID = veriler.YumurtaID WHERE veriler.FollukID = ? AND Renk = 'Kahverengi'");
-    // $stmt2->execute([$nestingid]);
-    // $brown = $stmt2->fetch(PDO::FETCH_ASSOC);
-    // $totalBrown = $brown['total'];
-
-    // // White
-    // $stmt3 = $pdo->prepare("SELECT COUNT(*) AS total FROM yumurtalar JOIN veriler ON yumurtalar.YumurtaID = veriler.YumurtaID WHERE veriler.FollukID = ? AND Renk = 'Beyaz'");
-    // $stmt3->execute([$nestingid]);
-    // $white = $stmt3->fetch(PDO::FETCH_ASSOC);
-    // $totalWhite = $white['total'];
-
-    // // Blue
-    // $stmt4 = $pdo->prepare("SELECT COUNT(*) AS total FROM yumurtalar JOIN veriler ON yumurtalar.YumurtaID = veriler.YumurtaID WHERE veriler.FollukID = ? AND Renk = 'Mavi'");
-    // $stmt4->execute([$nestingid]);
-    // $blue = $stmt4->fetch(PDO::FETCH_ASSOC);
-    // $totalBlue = $blue['total'];
-
-    // $stmt5 = $pdo->prepare("SELECT MONTH(veriler.Zaman) AS ay, yumurtalar.Renk AS renk, COUNT(*) AS total FROM veriler JOIN yumurtalar ON veriler.YumurtaID = yumurtalar.YumurtaID WHERE veriler.FollukID = ? GROUP BY ay, renk ORDER BY ay");
-    // $stmt5->execute([$nestingid]);
-    // $lastdata = $stmt5->fetchAll(PDO::FETCH_ASSOC);
-    
-    // $months = [];
-    // $colors = [];
-    // $colorData = [];
-    
-    // foreach ($lastdata as $row) {
-    //     $month = $row['ay'];
-    //     $color = $row['renk'];
-    //     $count = $row['total'];
-    
-    //     // Ayları ve renkleri gruplama
-    //     if (!in_array($month, $months)) {
-    //         $months[] = $month;
-    //     }
-    
-    //     if (!isset($colors[$color])) {
-    //         $colors[$color] = array_fill(0, 12, 0);
-    //     }
-    
-    //     $colors[$color][$month - 1] = $count;
-    // }
-    
-    // $monthNames = [
-    //     1 => 'Ocak',
-    //     2 => 'Şubat',
-    //     3 => 'Mart',
-    //     4 => 'Nisan',
-    //     5 => 'Mayıs',
-    //     6 => 'Haziran',
-    //     7 => 'Temmuz',
-    //     8 => 'Ağustos',
-    //     9 => 'Eylül',
-    //     10 => 'Ekim',
-    //     11 => 'Kasım',
-    //     12 => 'Aralık'
-    // ];
-    
-    // $months = array_map(function($m) use ($monthNames) {
-    //     return $monthNames[$m];
-    // }, $months);
-    
-    // $dataFromPHP = [
-    //     'months' => $months,
-    //     'colors' => $colors
-    // ];
+    $daysJSON = json_encode($days); //Verilerin eklendiği tarihi JavaScripte aktarmak için.
+    $sensorJSON = json_encode($sensors); //Sensör verilerini Javascripte aktarmak için.
+    $eggJSON = json_encode($eggsHistory); //Yumurta verilerini Javascripte aktarmak için
 }
 
-?>
+?>  
 
 <!DOCTYPE html>
-<html>
-    <head>
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width">
-      <title>User Page</title>
-      <link href="user.css" rel="stylesheet" type="text/css" />
-      <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
-      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-      <script src="./weather.js"></script>
-    </head>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="user.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Kullanıcı Veri Sayfası</title>
+</head>
+<body>
+    <div class="header">
+        <div class="top">
+            <div class="logo">
+                <a href="https://www.tubitak.gov.tr">
+                    <img id="logo" src="logo.png" alt="logo"/>
+                </a>
+            </div>
+            <div class="bideb">
+                <p id="bideb">TÜBİTAK-BİDEB 2209-A</p>
+                <p id="text">Web Tabanlı Görüntü İşlemeye Dayalı Folluk Takip Sistemi</p>
+            </div>
+            <div class="logout">
+                <a href="index.php?page=logout" class="logouta">
+                    <i id="logout" class="fa-solid fa-right-from-bracket"></i>
+                </a>
+            </div>
+        </div>
+        <div class="text">
+            
+        </div>
+    </div>
+    
+    <div class="currentDatasContainer">
+        <div class="currentDatasText">
+            <p id="currentDatasText">Anlık Veriler</p>
+        </div>
 
-    <body>
-        <div class="weather">
-            <a href="index.php?page=logout">
-                <div class="exit">
-                    <i class="fas fa-sign-out-alt"></i>
+        <div class="currentDatas">
+            <div class="vector"> 
+                <div class="refresh">
+                    <button id="refresh">Yenile</button>
                 </div>
-            </a>
-            <div class="parameters">
-                <div class="empty"></div>
-
-                <div class="title-container">
-                    <p class="title">Folluk Adı: <?=$datas['Konum']?></p>
-                </div>
-
-                <div class="top-full-container">
-                    <div class="full-container">
-                        <div class="subtitle-container">
-                            <p class="subtitle">Yumurta Sayısı </p>
-                        </div>
-                        <div class="value-container">
-                            <p class="value"><?=$datas['Adet']?> adet</p>
-                        </div>
+                
+                <div id="output"></div>
+            </div>
+            
+            <div class="containerDatas">
+                <div class="left">
+                    <div class="heat">
+                        <p id="heat">Sıcaklık</p>
                     </div>
-
-                    <div class="full-container">
-                        <div class="subtitle-container">
-                            <p class="subtitle">Hava Sıcaklığı </p>
-                        </div>
-                        <div class="value-container">
-                            <p class="value" id="degree_value">Sıcaklık Değerini Çekerken Beklenmedik Bir Hata Oluştu</p>
-                        </div>
+                    <div class="heatValue">
+                        <p id="heatValue"><?=$sensors['temperature']?>°C</p>
                     </div>
-
-                    <div class="full-container">
-                        <div class="subtitle-container">
-                            <p class="subtitle">Nem </p>
-                        </div>
-                        <div class="value-container">
-                            <p class="value" id="humidity_value">Nem Değerini Çekerken Beklenmedik Bir Hata Oluştu</p>
-                        </div>
+                    <div class="humidity">
+                        <p id="humidity">Nem</p>
+                    </div>
+                    <div class="humidityValue">
+                        <p id="humidityValue">%<?=$sensors['humidity']?></p>
+                    </div>
+                    <div class="sound">
+                        <p id="sound">Ses Seviyesi</p>
+                    </div>
+                    <div class="soundValue">
+                        <p id="soundValue"><?=$sensors['sound_level']?> dB</p>
                     </div>
                 </div>
-
-                <div class="bot-full-continer">
-                    <div class="full-container">
-                        <div class="subtitle-container">
-                            <p class="subtitle">Desibel </p>
+                <div class="mid">
+                    <img id="photo" src="foto.jpg" alt="">
+                </div>
+                <div class="right">
+                    <div class="topEgg">
+                        <div class="white">
+                            <img id="white" src="./white_new.png" alt="white">
+                            <p id="whiteText"><?=$eggs['white_eggs']?></p>
                         </div>
-                        <div class="value-container">
-                            <p class="value"><?=$datas['Desibel']?> db</p>
-                        </div>
-                    </div>
-
-                    <div class="full-container">
-                        <div class="subtitle-container">
-                            <p class="subtitle">UV </p>
-                        </div>
-                        <div class="value-container">
-                            <p class="value" id="uv_value">UV Değerini Çekerken Beklenmedik Bir Hata Oluştu</p>
+                        <div class="brown">
+                            <img id="brown" src="./brown_new.png" alt="brown">
+                            <p id="brownText"><?=$eggs['brown_eggs']?></p>
                         </div>
                     </div>
-
-                    <div class="full-container">
-                        <div class="subtitle-container">
-                            <p class="subtitle">Rüzgar Hızı </p>
+                    <div class="botEgg">
+                        <div class="blue">
+                            <img id="blue" src="./blue_new.png" alt="blue">
+                            <p id="blueText"><?=$eggs['blue_eggs']?></p>
                         </div>
-                        <div class="value-container">
-                            <p class="value" id="wind_speed">Rüzgar Hızı Değerini Çekerken Beklenmedik Bir Hata Oluştu</p>
-                        </div>
+                        <div class="total">
+                            <img id="total" src="./total_new.png" alt="all">
+                            <p id="totalText"><?=$total?></p>
+                        </div> 
                     </div>
                 </div>
             </div>
         </div>
+    </div> 
 
-        <div class="image-title">
-            <h1 class="img-text">Folluğunuzun En Son Kaydedilmiş Resmi</h1>
+    <div class="coopHistoryContainer">
+        <div class="coopHistoryText">
+            <p id="coopHistoryText">Folluk Geçmişi</p>
         </div>
-
-        <div class="top">
-            <img src="0009-Nesting-Box-Herb-Rosemary.jpg" alt="nesting box">
+        <div class="coopHistory">
+            <div class="graph">
+                <canvas id="myCanvas" width="1728" height="400"></canvas>
+            </div>
         </div>
+    </div>
 
-        <div class="graph">
-            <canvas id="myCanvas" width="1920" height="1080"></canvas>
+    <div class="footerContainer">
+        <div class="footerImg">
+            <a href="https://www.hitit.edu.tr">
+                <img id="fotouni" src="logouni.png" alt="">
+            </a>
         </div>
+        <div class="footer">
+            <p id="footer">2023-2024 Hitit Üniversitesi <a id="footera" href="https://mf.hitit.edu.tr/tr/bilgisayar">Bilgisayar</a> Mühendisliği</p>
+        </div>
+    </div>
 
-        <script>
+    <script>
+        // Yenileme tuşuna basıldığında işlemi gerçekleştirmek için.
+        document.getElementById("refresh").addEventListener("click", function() {
+            document.getElementById("output").innerText = "Yükleniyor...";
+        })
 
-            var colorData = <?php echo $dataFromPHP; ?>;
+        //PHP'den gelen verileri almak için.
+        const sensorData = <?php echo $sensorJSON; ?>;
+        const eggData = <?php echo $eggJSON; ?>;
+        const dayLabels = <?php echo $daysJSON; ?>;
 
-            var months = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+        // Yumurta türlerini grafik için ayrıştır.
+        let brownEggs = [];
+        let blueEggs = [];
+        let whiteEggs = [];
 
-            var datasets = [];
+        // Yumurta sayılarını 
+        for (let i = 0; i < eggData.length; i++) {
+            brownEggs.push(parseInt(eggData[i].brown_eggs));
+            blueEggs.push(parseInt(eggData[i].blue_eggs));
+            whiteEggs.push(parseInt(eggData[i].white_eggs));
+        }
 
-            // Her bir renk için veri kümesi oluştur
-            for (var color in colorData) {
-                datasets.push({
-                    label: color.charAt(0).toUpperCase() + color.slice(1), // Renk ismini büyük harfle başlat
-                    data: colorData[color],
-                    backgroundColor: color === 'mavi' ? 'rgba(0, 0, 255, 1)' : (color === 'beyaz' ? 'rgba(255, 255, 255, 1)' : 'rgba(97, 49, 4, 1)'),
-                    borderColor: color === 'mavi' ? 'rgba(0, 0, 255, 1)' : (color === 'beyaz' ? 'rgba(255, 255, 255, 1)' : 'rgba(97, 49, 4, 1)'),
-                    borderWidth: 1
-                });
-            }
-
-            var ctx = document.getElementById("myCanvas").getContext("2d");
-            var myChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: months,
-                    datasets: datasets
+        // Chart.js ile grafik oluşturma ve grafiğe değer girme.
+        const ctx = document.getElementById("myCanvas").getContext("2d");
+        const myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: dayLabels, // Günler
+                datasets: [ // Verilerin grafikte gösterim stilleri ayarlanıyor.
+                    {
+                        label: 'Kahverengi Yumurta',
+                        data: brownEggs,
+                        borderColor: 'brown',
+                        backgroundColor: 'rgba(165, 42, 42, 0.2)',
+                        fill: true
+                    },
+                    {
+                        label: 'Mavi Yumurta',
+                        data: blueEggs,
+                        borderColor: 'blue',
+                        backgroundColor: 'rgba(0, 0, 255, 0.2)',
+                        fill: true
+                    },
+                    {
+                        label: 'Beyaz Yumurta',
+                        data: whiteEggs,
+                        borderColor: 'gray',
+                        backgroundColor: 'rgba(192, 192, 192, 0.2)',
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                // Grafiğin başlık ve yazı boyutu gibi özellikleri ayarlanıyor.
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Yumurta Türleri ve Günlere Göre Veriler',
+                        font: {
+                            size: 24
+                        }
+                    }
                 },
-                options: {
-                    plugins: {
+                // X ve Y koordinatlarının özellikleri ayarlanıyor.
+                scales: {
+                    x: {
+                        beginAtZero: true,
                         title: {
                             display: true,
-                            text: 'Renklerine Göre Yumurta Sayısı',
-                            font: {
-                                size: 24
-                            }
+                            text: 'Günler'
                         }
                     },
-                    scales: {
-                        x: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Aylar'
-                            }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Yumurta Sayısı'
-                            }
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Yumurta Sayısı'
                         }
                     }
                 }
-            });
-
-            // var canvas = document.getElementById("myCanvas");
-            // var ctx = canvas.getContext("2d");
-            // var data = [12, 19, 3, 17, 6, 3, 7, 12, 19, 3, 17, 6];
-            // var labels = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-
-            // var myChart = new Chart(ctx, {
-            //     type: 'line',
-            //     data: {
-            //         labels: ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'],
-            //         datasets: [
-            //             {
-            //                 label: 'Mavi',
-            //                 data: [12, 19, 3, 5, 2, 3, 12, 19, 3, 5, 2, 3],
-            //                 backgroundColor: 'rgba(0, 0, 255, 1)',
-            //                 borderColor: 'rgba(0, 0, 255, 1)',
-            //                 borderWidth: 1
-            //             },
-            //             {
-            //                 label: 'Beyaz',
-            //                 data: [20, 30, 40, 50, 20, 30, 40, 50, 20, 30, 40, 50],
-            //                 backgroundColor: 'rgba(255, 255, 255, 1)',
-            //                 borderColor: 'rgba(255, 255, 255, 1)',
-            //                 borderWidth: 1
-            //             },
-            //             {
-            //                 label: 'Kahverengi',
-            //                 data: [10, 20, 30, 40, 10, 20, 30, 40, 10, 20, 30, 40],
-            //                 backgroundColor: 'rgba(97, 49, 4, 1)',
-            //                 borderColor: 'rgba(97, 49, 4, 1)',
-            //                 borderWidth: 1
-            //             },
-            //         ]
-            //     },
-            //     options: {
-            //         plugins: {
-            //             title: {
-            //                 display: true,
-            //                 text: 'Renklerine Göre Yumurta Sayısı',
-            //                 font: {
-            //                     size: 24
-            //                 }
-            //             }
-            //         },
-            //         scales: {
-            //             x: {
-            //                 beginAtZero: true,
-            //                 title: {
-            //                     display: true,
-            //                     text: 'Aylar'
-            //                 }
-            //             },
-            //             y: {
-            //                 beginAtZero: true,
-            //                 title: {
-            //                     display: true,
-            //                     text: 'Yumurta Sayısı'
-            //                 }
-            //             }
-            //         }
-            //     }
-            // });
-
-            // var ctx = document.getElementById('myCanvas').getContext('2d');
-            // var dataFromPHP = <?= json_encode($dataFromPHP) ?>;
-            
-            // var myChart = new Chart(ctx, {
-            //     type: 'bar',
-            //     data: {
-            //         labels: dataFromPHP.months,
-            //         datasets: Object.keys(dataFromPHP.colors).map(function(color) {
-            //             return {
-            //                 label: color,
-            //                 data: dataFromPHP.colors[color],
-            //                 backgroundColor: getColor(color),
-            //                 borderColor: getColor(color),
-            //                 borderWidth: 1
-            //             };
-            //         })
-            //     },
-            //     options: {
-            //         plugins: {
-            //             title: {
-            //                 display: true,
-            //                 text: 'Renklerine Göre Yumurta Sayısı',
-            //                 font: {
-            //                     size: 24
-            //                 }
-            //             }
-            //         },
-            //         scales: {
-            //             x: {
-            //                 beginAtZero: true,
-            //                 title: {
-            //                     display: true,
-            //                     text: 'Aylar'
-            //                 }
-            //             },
-            //             y: {
-            //                 beginAtZero: true,
-            //                 title: {
-            //                     display: true,
-            //                     text: 'Yumurta Sayısı'
-            //                 }
-            //             }
-            //         }
-            //     }
-            // });
-            
-            // function getColor(color) {
-            //     switch(color) {
-            //         case 'Kahverengi': return 'rgba(97, 49, 4, 1)';
-            //         case 'Beyaz': return 'rgba(255, 255, 255, 1)';
-            //         case 'Mavi': return 'rgba(0, 0, 255, 1)';
-            //         default: return 'rgba(0, 0, 0, 1)';
-            //     }
-            // }
-        </script>
-    </body>
+            }
+        });
+    </script>
+</body>
 </html>

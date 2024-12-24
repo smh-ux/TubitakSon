@@ -1,0 +1,74 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: #eee;
+}
+
+.currentDatasText {
+    background-color: #FFF;
+}
+
+.currentDatasContainer {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    border-top: 1px solid #000;
+    border-bottom: 1px solid #000;
+    width: 100vw;
+    height: 70vh
+}
+
+.refresh {
+    width: 10vw;
+    height: 10vh;
+}
+
+.whiteEgg {
+    transform: scale(0.4);
+}
+
+.brownEgg {
+    transform: scale(0.4);
+}
+
+.blueEgg {
+    transform: scale(0.4);
+}
+
+.allEgg {
+    transform: scale(0.4);
+}
+
+.currentImage {
+    transform: scale(0.5);
+    margin-top: -200px;
+    margin-left: 100px;
+}
+
+.censorDataTable {
+    display: flex;
+    margin-left: -100px;
+}
+
+.heat {
+
+}
+
+.humidity {
+    margin-left: 10px;
+}
+
+.sound {
+    margin-left: 10px;
+}
+
+.graphContainerText {
+
+}
+
+.graphContainer {
+    
+}

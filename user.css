@@ -3,119 +3,345 @@
   padding: 0;
 }
 
-html {
-  height: 100%;
-  width: 100%;
-}
-
 body {
-  background-color: #FFFFFF;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
 }
 
-.exit {
-  font-size: 2.5em;
-  float: right;
-  color: #FF5800;
-  margin-top: 2%;
-  margin-right: 5%;
-  transition: 0.3s;
-}
-
-.exit:hover {
-  color: #7A7D81;
-  transition: 0.3s;
-}
-
-.weather {
-  width: 100%;
-  height: 84%;
-  background-color: #aaa;
-}
-
-.parameters {
-  width: 100%;
-  height: 100%;
-  background-color: #aaa;
-}
-
-.empty{
-  width: 100%;
-  height: 5%;
-}
-
-.title-container {
-  background-color: #aaa;
-}
-
-.title {
-  color: #444;
-  font-size: 50px;
-  font-weight: bold;
-  text-align: center;
-}
-
-.full-container {
-  width: 20%;
-  height: 50%;
-  margin-top: 5%;
-  margin-left: 8%;
-  background-color: #666;
-  border-radius: 50px;
-  display: inline-block;
-  transition: 0.5s;
-  box-shadow: 0px 0px 40px rgba(102, 102, 102, 1), inset 0px 0px 40px rgba(80, 80, 80, 1);
-}
-
-.full-container:hover {
-  box-shadow: 0px 0px 40px rgba(255, 88, 1, 1);
-  transition: 0.5s;
-}
-
-.subtitle {
-  font-weight: bold;
-  font-size: 35px;
-  text-align: center;
-  margin-top: 10%;
-  color: rgba(255, 88, 1, 1);
-}
-
-.value {
-  font-size: 30px;
-  font-weight: bold; 
-  text-align: center;
-  margin-top : 10%;
-  margin-bottom: 10%;
-  color: rgba(255, 88, 1, 1);
-}
-
-.image-title {
-  width: 100%;
-  height: 16%;
-  background-color: #666;
-}
-
-.img-text {
-  text-align: center;
-  padding-top: 4%;
-  color: rgba(255, 88, 1, 1);
-}
+.header {
+  border-bottom: 1px solid #000;
+} 
 
 .top {
-  margin-top: 0%;
-  width: 100%;
-  height: 100%;
+  display: flex;
+  flex: 3;
+  flex-direction: row;
+  width: 100vw;
 }
 
-img {
-  width: 100%;
-  height: 100%;
+.logo {
+  width: 100px;
+  height: 100px;
+  flex: 1;
 }
 
-.graph {
-  background-color: rgba(0, 0, 0, 0.9);
-  margin-left: 0%;
-  border-top: 1px solid #E3E9EF;
+#logo {
+  transform: scale(0.2);
+  transform-origin: top left;
+  margin-left: 30px;
+  margin-top: 15px;
+}
+
+.bideb {
+  flex: 1;
+  width: 100px;
+}
+
+#bideb {
+  text-align: center;
+  margin-top: 40px;
+  font-weight: bold;
+  font-size: 24px;
+}
+
+.logout {
+  flex: 1;
+}
+
+.logouta {
+  color: #000;
+}
+
+.logouta:hover {
+  color: #FF5800;
+}
+
+#logout {
+  float: right;
+  margin-right: 30px;
+  margin-top: 40px;
+  font-size: xx-large;
+}
+
+#text {
+  text-align: center;
+  font-size: 24px;
+  color: crimson;
+}
+
+.currentDatasContainer {
+  margin-top: 10px;
+}
+
+.currentDatas {
+  border: 1px solid #000;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  width: 90%;
+  margin-left: 5%;
+  z-index: 1;
+}
+
+.currentDatasText {
+  position: relative;
+  background-color: #FFF;
+  width: 100px;
+  margin-left: 100px;
+  z-index: 3;
+}
+
+#currentDatasText {
+  margin-bottom: -20px;
+  color: #000;
+  text-align: center;
+}
+
+.vector {
+  display: flex;
+  flex-direction: row;
+}
+
+.refresh {
+  background-color: #FFF;   
+  border: 1px solid #FFF;
+  width: 100px;
+  margin-top: 10px;
+  margin-left: 10px;
+}
+
+#refresh {
+  text-align: center;
+  width: 100px;
+  background-color: #FFF;
+}
+
+#output {
+  margin-left: 20px;
+  margin-top: 10px;
+}
+
+.containerDatas {
+  display: flex;
+  flex-direction: row;
+  border: 1px solid #000;
+  width: 50%;
+  margin-left: 25%;
+  margin-bottom: 10px;
+}
+
+.left {
+  display: flex;
+  flex-direction: column;
+  width: 150px;
+}
+
+.heat {
+  border-bottom: 1px solid #000;
+  flex: 1;
+  background-color: #eee;
+}
+
+#heat {
+  text-align: center;
+  margin-top: 18px;
+}
+
+.heatValue {
+  border-bottom: 1px solid #000;
+  flex: 1;
+}
+
+#heatValue {
+  text-align: center;
+  margin-top: 18px;
+  font-weight: bold;
+}
+
+.humidity {
+  border-bottom: 1px solid #000;
+  flex: 1;
+  background-color: #eee;
+}
+
+#humidity {
+  text-align: center;
+  margin-top: 18px;
+}
+
+.humidityValue {
+  border-bottom: 1px solid #000;
+  flex: 1;
+  font-weight: bold;
+}
+
+#humidityValue {
+  text-align: center;
+  margin-top: 18px;
+}
+
+.sound {
+  border-bottom: 1px solid #000;
+  flex: 1;
+  background-color: #eee;
+}
+
+#sound {
+  text-align: center;
+  margin-top: 18px;
+}
+
+.soundValue {
+  border-bottom: 1px solid #000;
+  flex: 1;
+  font-weight: bold;
+}
+
+#soundValue {
+  text-align: center;
+  margin-top: 18px;
+}
+
+.mid {
+  width: 456px;
+  height: 304px;
+}
+
+#photo {
+  transform: scale(0.5);
+  transform-origin: top left;
+}
+
+.right {
+  display: flex;
+  flex-direction: column;
+}
+
+.topEgg {
+  display: flex;
+  flex-direction: row;
+}
+
+.botEgg {
+  display: flex;
+  margin-top: 50px;
+}
+
+.white {
+
+}
+
+#white {
+  width: 80px;
+  height: 100px;
+}
+
+#whiteText {
+  margin-top: -60px;
+  margin-left: 30px;
+}
+
+.brown {
+
+}
+
+#brown {
+  width: 80px;
+  height: 100px;
+}
+
+#brownText {
+  margin-top: -60px;
+  margin-left: 30px;
+}
+
+.blue {
+
+}
+
+#blue {
+  width: 80px;
+  height: 100px;
+}
+
+#blueText {
+  margin-top: -60px;
+  margin-left: 30px;
+}
+
+.total {
+
+}
+
+#total {
+  width: 120px;
+  height: 100px;
+}
+
+#totalText {
+  margin-top: -55px;
+  margin-left: 52px;
+}
+
+.coopHistoryContainer {
+  margin-top: 0px;
+}
+
+.coopHistoryText {
+  position: relative;
+  background-color: #FFF;
+  width: 110px;
+  margin-left: 100px;
+  z-index: 3;
+}
+
+#coopHistoryText {
+  margin-bottom: -10px;
+  color: #000;
+  text-align: center;
+}
+
+.coopHistory {
+  border: 1px solid #000;
+  height: 380px;
+  margin-bottom: 10px;
+  width: 90%;
+  margin-left: 5%;
+}
+
+.footerContainer {
+  margin-top: 50px;
+}
+
+.footerImg {
+  position: relative;
+  width: 170px;
+  height: 51px;
+  float: right;
+  margin-top: -20px;
+  margin-right: 50px;
+  background-color: #FFF;
+  z-index: 3;
+}
+
+#fotouni {
+  width: 146px;
+  height: 51px;
+  margin-left: 10px;
+}
+
+.footer {
+  border-top: 1px solid #000;
+}
+
+#footer {
+  text-align: center;
+  font-weight: bold;
+  font-size: larger;
+  margin-top: 30px;
+}
+
+#footera {
+  text-decoration: none;
+  color: #000;
 }

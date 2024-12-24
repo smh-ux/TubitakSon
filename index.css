@@ -48,16 +48,16 @@ body {
 }
 
 .people_div {
-    margin-left: 46%;
-    display: inline-block;
-    margin-top: 2.5%;
+    position: absolute;
+    margin-left: 40%;
+    margin-top: 2%;
 }
 
 #people {
     text-decoration: none;
     color: #7A7D81;
     font-size: 1.7em;
-    margin-top: 10%;
+    margin-top: 5%;
 }
 
 #people:hover {

@@ -1,21 +1,24 @@
 <?php
-
+// id aktarılmış mı? diye kontrol et.
 if (isset($_GET['id'])) {
+    // Gelen istek POST mu? diye kontrol et.
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        // POST ile gelen değerleri değişkenlere ata.
         $new_password = $_POST["new_password"];
         $new_password_again = $_POST["new_password_again"];
 
-        // $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
-
+        // Şifrenin değiştirilebilmesi için girilen şifre ve doğrulamasının eşleşmesini kontrol et.
         if ($new_password == $new_password_again) {
-            $stmt = $pdo->prepare("SELECT * FROM kullanicilar WHERE KullaniciID = ?");
+            // id'si aktarılan kullanıcı blgilerini veritabanından getiren SQL sorgusu.
+            $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
             $stmt->execute([$_GET['id']]);
             $member_info = $stmt->fetch(PDO::FETCH_ASSOC);
 
+            // Kullanıcı mevcut mu diye kontrol et.
             if ($member_info) {
-                $sql = "UPDATE kullanicilar SET Sifre = ? WHERE KullaniciID = ?";
+                // Girilen bilgileri kullanarak kullanıcının şifresini güncellemek için SQL sorgusu.
+                $sql = "UPDATE users SET password = ? WHERE id = ?";
                 $stmt = $pdo->prepare($sql);
-                // $stmt->execute([$hashed_password, $_GET['id']]);
                 $stmt->execute([$new_password, $_GET['id']]);
 
                 header('Location: index.php?page=info1');
@@ -34,5 +37,4 @@ if (isset($_GET['id'])) {
     header('Location: index.php?page=admin');
     exit();
 }
-
 ?>
