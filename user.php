@@ -169,7 +169,7 @@ if(isset($_GET['userid']) && isset($_GET['coopid']) && isset($_GET['nestingid'])
     <script>
         // Yenileme tuşuna basıldığında işlemi gerçekleştirmek için.
         document.getElementById("refresh").addEventListener("click", function() {
-            document.getElementById("output").innerText = "Yükleniyor...";
+            location.href = "index.php?page=managementupdate";
         })
 
         //PHP'den gelen verileri almak için.

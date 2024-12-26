@@ -2,28 +2,25 @@
 // Gelen istek POST mu? diye kontrol et.
 if($_SERVER["REQUEST_METHOD"] == "POST") {
     // Her bir input değerini değişkenlere ata.
-    $name = $_POST["name"];
-    $surname = $_POST["surname"];
+    $username = $_POST["username"];
     $password = $_POST["password"];
-    $kumesID = $_POST["kumesID"];
-    $follukID = $_POST["follukID"];
+    $firstname = $_POST["firstname"];
+    $lastname = $_POST["lastname"];
+    $roleid = $_POST["roleid"];
 
     // Değişkenleri kullanarak veritabanına kullanıcı eklemek için bir sorgu oluştur.
     $sql = "INSERT INTO users (
-        first_name,
+        username,
+        firstname,
         last_name,
-        Sifre,
-        KumesID,
-        FollukID,
-        Yetki
-        )
-        VALUES (
-            '{$name}',
-            '{$surname}',
+        password,
+        role_id,
+        ) VALUES (
+            '{$username}',
+            '{$firstname}',
+            '{$lastname}',
             '{$password}',
-            '{$kumesID}',
-            '{$follukID}',
-            'kullanıcı'
+            '{$roleid}'
         )";
     // Sorguyu uygula.
     $pdo->exec($sql);

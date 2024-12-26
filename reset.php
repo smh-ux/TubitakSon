@@ -4,8 +4,8 @@ if (isset($_GET['id'])) {
     // Gelen istek POST mu? diye kontrol et.
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // POST ile gelen değerleri değişkenlere ata.
-        $new_password = $_POST["new_password"];
-        $new_password_again = $_POST["new_password_again"];
+        $new_password = $_POST["username"];
+        $new_password_again = $_POST["password"];
 
         // Şifrenin değiştirilebilmesi için girilen şifre ve doğrulamasının eşleşmesini kontrol et.
         if ($new_password == $new_password_again) {

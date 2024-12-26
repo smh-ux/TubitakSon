@@ -47,9 +47,9 @@ if(!$_SESSION['loggedinAdmin']) {
                     <div class="botbotright">
                         <input type="text" name="username" id="username" required>
                         <input type="password" name="password" id="password" required>
-                        <input type="text" name="username" id="username" required>
-                        <input type="text" name="password" id="password" required>
-                        <input type="number" name="username" id="username" min=1 max=2 step=1 required>
+                        <input type="text" name="username" id="firstname" required>
+                        <input type="text" name="password" id="lastname" required>
+                        <input type="number" name="username" id="roleid" min=1 max=2 step=1 required>
                     </div>
                 </div>
                 <div class="button">
