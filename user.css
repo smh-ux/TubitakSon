@@ -219,6 +219,16 @@ body {
   margin-left: 2%;
 }
 
+.rightTitle {
+  margin-top: -21px;
+  margin-bottom: 10px;
+  border: 1px solid #000;
+}
+
+#rightTitle {
+  text-align: center;
+}
+
 .topEgg {
   display: flex;
   flex-direction: row;
@@ -230,7 +240,16 @@ body {
 }
 
 .white {
+  border: 1px solid #000;
+  height: 125px;
+}
 
+.whiteTitle {
+  border-bottom: 1px solid #000;
+}
+
+#whiteTitle {
+  text-align: center;
 }
 
 #white {
@@ -244,7 +263,17 @@ body {
 }
 
 .brown {
+  border: 1px solid #000;
+  height: 125px;
+  margin-left: 10px;
+}
 
+.brownTitle {
+  border-bottom: 1px solid #000;
+}
+
+#brownTitle {
+  text-align: center;
 }
 
 #brown {
@@ -258,7 +287,18 @@ body {
 }
 
 .blue {
+  border: 1px solid #000;
+  height: 125px;
+  margin-left: 10px;
+  margin-right: 10px
+}
 
+.blueTitle {
+  border-bottom: 1px solid #000;
+}
+
+#blueTitle {
+  text-align: center;
 }
 
 #blue {
@@ -272,7 +312,18 @@ body {
 }
 
 .total {
+  border: 1px solid #000;
+  height: 125px;
+  margin-top: -20px;
+  margin-left: 75px;
+}
 
+.totalTitle {
+  border-bottom: 1px solid #000;
+}
+
+#totalTitle {
+  text-align: center;
 }
 
 #total {

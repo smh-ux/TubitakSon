@@ -3,7 +3,7 @@
 if(!isset($_SESSION['loggedinMember'])) {
     header("Location: index.php?page=login");
 }
-
+// Diğer sayfalardan userid, coopid ve nestingid değerleri gönderilmiş mi? diye kotrol ediyoruz.
 if(isset($_GET['userid']) && isset($_GET['coopid']) && isset($_GET['nestingid'])) {
     // Önceki sayfalarda gelen kullanıcı, kümes, folluk id biligilerini alıyoruz.
     $userid    = $_GET['userid'];
@@ -140,25 +140,40 @@ if(isset($_GET['userid']) && isset($_GET['coopid']) && isset($_GET['nestingid'])
                     </div>
                 </div>
                 <div class="mid">
-                    <img id="photo" src="image2.jpeg" alt="">
+                    <img id="photo" src="image1.jpeg" alt="">
                 </div>
                 <div class="right">
+                    <div class="rightTitle">
+                        <p id="rightTitle">Yumurta Sayıları</p>
+                    </div>
                     <div class="topEgg">
                         <div class="white">
+                            <div class="whiteTitle">
+                                <p id="whiteTitle">Beyaz</p>
+                            </div>
                             <img id="white" src="./white_new.png" alt="white">
                             <p id="whiteText"><?=$eggs['white_eggs']?></p>
                         </div>
                         <div class="brown">
+                            <div class="brownTitle">
+                                <p id="brownTitle">Kahverengi</p>
+                            </div>
                             <img id="brown" src="./brown_new.png" alt="brown">
                             <p id="brownText"><?=$eggs['brown_eggs']?></p>
                         </div>
-                    </div>
-                    <div class="botEgg">
                         <div class="blue">
+                            <div class="blueTitle">
+                                <p id="blueTitle">Mavi</p>
+                            </div>
                             <img id="blue" src="./blue_new.png" alt="blue">
                             <p id="blueText"><?=$eggs['blue_eggs']?></p>
                         </div>
+                    </div>
+                    <div class="botEgg">
                         <div class="total">
+                            <div class="totalTitle">
+                                <p id="totalTitle">Toplam</p>
+                            </div>
                             <img id="total" src="./total_new.png" alt="all">
                             <p id="totalText"><?=$total?></p>
                         </div> 
