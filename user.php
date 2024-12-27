@@ -43,9 +43,33 @@ if(isset($_GET['userid']) && isset($_GET['coopid']) && isset($_GET['nestingid'])
     $daysJSON = json_encode($days); //Verilerin eklendiği tarihi JavaScripte aktarmak için.
     $sensorJSON = json_encode($sensors); //Sensör verilerini Javascripte aktarmak için.
     $eggJSON = json_encode($eggsHistory); //Yumurta verilerini Javascripte aktarmak için
-}
 
+
+
+
+
+
+    // // guncel_fotograf tablosunda bulunan verileri getir.
+    // $sql3 = $pdo->prepare("SELECT * FROM guncel_fotograf WHERE id=1 ");
+    // $stmt3 = $conn->prepare($sql3);
+    // $stmt3->bind_param("i");
+    // $stmt3->execute();
+    // $stmt3->store_result();
+    // $stmt3->bind_result($fotografBlob);
+    // $stmt3->fetch();
+
+    // // Doğru başlıklar
+    // header("Content-Type: image/jpeg"); // Resim türüne göre ayarla (örneğin, image/png)
+    // header("Content-Length: " . strlen($fotografBlob));
+
+    // // Resmi göster
+    // echo $fotografBlob;
+    // exit;
+    
+}
 ?>  
+
+<?php // Kullanıcı sayfası ?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -116,7 +140,7 @@ if(isset($_GET['userid']) && isset($_GET['coopid']) && isset($_GET['nestingid'])
                     </div>
                 </div>
                 <div class="mid">
-                    <img id="photo" src="foto.jpg" alt="">
+                    <img id="photo" src="image2.jpeg" alt="">
                 </div>
                 <div class="right">
                     <div class="topEgg">
@@ -224,7 +248,7 @@ if(isset($_GET['userid']) && isset($_GET['coopid']) && isset($_GET['nestingid'])
                 plugins: {
                     title: {
                         display: true,
-                        text: 'Yumurta Türleri ve Günlere Göre Veriler',
+                        text: 'Günlere Göre Yumurta Türleri ve Sayıları',
                         font: {
                             size: 24
                         }

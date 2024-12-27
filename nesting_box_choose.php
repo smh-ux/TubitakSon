@@ -56,6 +56,3 @@ if (isset($_GET['coopid']) && isset($_GET['userid'])) {
     </div>
 </body>
 </html>
-
-<?php // Daha önce oluşturulmuş template'i kullanmak için çağırıyoruz. ?>
-<?=template_footer_nesting_box_choose()?>

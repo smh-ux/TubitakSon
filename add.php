@@ -11,7 +11,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
     // Değişkenleri kullanarak veritabanına kullanıcı eklemek için bir sorgu oluştur.
     $sql = "INSERT INTO users (
         username,
-        firstname,
+        first_name,
         last_name,
         password,
         role_id,

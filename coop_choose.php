@@ -54,6 +54,3 @@ if (isset($_GET['userid'])) {
         </div>
     </body>
     </html>
-
-<?php // Daha önce oluşturulmuş template'i kullanmak için çağırıyoruz. ?>
-<?=template_footer_coop_choose()?>

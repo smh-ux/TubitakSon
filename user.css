@@ -125,8 +125,8 @@ body {
   display: flex;
   flex-direction: row;
   border: 1px solid #000;
-  width: 50%;
-  margin-left: 25%;
+  width: 41%;
+  margin-left: 29.5%;
   margin-bottom: 10px;
 }
 
@@ -203,18 +203,20 @@ body {
 }
 
 .mid {
-  width: 456px;
+  width: 304px;
   height: 304px;
 }
 
 #photo {
-  transform: scale(0.5);
+  transform: scale(0.475);
   transform-origin: top left;
+  margin-left: 1%;
 }
 
 .right {
   display: flex;
   flex-direction: column;
+  margin-left: 2%;
 }
 
 .topEgg {

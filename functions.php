@@ -382,14 +382,6 @@ function template_admin3() {
     EOT;
 }
 
-// Admin sayfasının dördüncü kısmının(kullanıcı ekleme) footer kısmı.
-function template_footer_admin3() {
-    echo <<< EOT
-      </body>
-    </html>
-    EOT;
-}
-
 // Kümes seçim sayfasının header kısmı.
 function template_coop_choose() {
     echo <<< EOT
@@ -404,14 +396,6 @@ function template_coop_choose() {
     </head>
     
     <body>
-    EOT;
-}
-
-// Kümes seçim sayfasının footer kısmı.
-function template_footer_coop_choose() {
-    echo <<< EOT
-        </body>
-    </html>
     EOT;
 }
 
@@ -431,12 +415,3 @@ function template_nesting_box_choose() {
     <body>
     EOT;
 }
-
-// Folluk seçim sayfasının footer kısmı.
-function template_footer_nesting_box_choose() {
-    echo <<< EOT
-        </body>
-    </html>
-    EOT;
-}
-?>
